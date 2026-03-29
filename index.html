@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0f1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Inscriptor Patrick" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjM0IiBmaWxsPSIjMGQwZjFhIi8+CiAgPHJlY3QgeD0iNDIiIHk9IjMwIiB3aWR0aD0iMTA4IiBoZWlnaHQ9IjI2IiBmaWxsPSIjZTMwNjEzIi8+CiAgPHJlY3QgeD0iNzMiIHk9IjU3IiB3aWR0aD0iNDYiIGhlaWdodD0iNzYiIGZpbGw9IiNlMzA2MTMiLz4KICA8cmVjdCB4PSI0MiIgeT0iMTM0IiB3aWR0aD0iMTA4IiBoZWlnaHQ9IjI2IiBmaWxsPSIjZTMwNjEzIi8+Cjwvc3ZnPg==" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%230d0f1a%22/%3E%3Crect%20x%3D%228%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%224%22%20fill%3D%22%23e30613%22/%3E%3Crect%20x%3D%2213%22%20y%3D%2210%22%20width%3D%226%22%20height%3D%2212%22%20fill%3D%22%23e30613%22/%3E%3Crect%20x%3D%228%22%20y%3D%2222%22%20width%3D%2216%22%20height%3D%224%22%20fill%3D%22%23e30613%22/%3E%3C/svg%3E" />
+  <title>Inscriptor Patrick 🏸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; min-height: 100dvh;
+      background: #0d0f1a;
+      font-family: 'Outfit', sans-serif; color: #f0f0f0; overflow-x: hidden;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* ── Backgrounds ── */
+    #bg-grid { position: fixed; inset: 0; opacity: .04; background-image: linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px); background-size: 60px 60px; pointer-events: none; }
+    #glow-red  { position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle,rgba(227,6,19,.15) 0%,transparent 70%); pointer-events: none; }
+    #glow-navy { position: fixed; bottom: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle,rgba(0,50,160,.12) 0%,transparent 70%); pointer-events: none; }
+
+    .container { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    /* ── Header ── */
+    .badge { display: inline-block; background: rgba(227,6,19,.15); border: 1px solid rgba(227,6,19,.4); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #e30613; text-transform: uppercase; margin-bottom: 20px; }
+    h1 { font-size: clamp(42px,10vw,72px); font-weight: 900; line-height: .95; margin-bottom: 16px; letter-spacing: -2px; }
+    h1 span { color: #e30613; }
+    .subtitle { font-family:'Space Mono',monospace; font-size:13px; color:rgba(255,255,255,.4); margin-bottom: 12px; }
+
+    .live-badge { display: inline-flex; align-items: center; gap: 6px; font-family:'Space Mono',monospace; font-size: 10px; color: rgba(227,6,19,.6); letter-spacing: 1px; margin-bottom: 0; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #e30613; animation: pulse-dot 2s ease-in-out infinite; }
+    .live-badge.syncing .live-dot { background: #ffab40; }
+    .live-badge.syncing { color: rgba(255,171,64,.6); }
+
+    /* ── Notification button ── */
+    .notif-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 6px 14px; cursor: pointer; font-family: 'Outfit',sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.4); transition: all .2s; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+    .notif-btn:hover { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+    .notif-btn.active { background: rgba(227,6,19,.12); border-color: rgba(227,6,19,.4); color: #e30613; }
+    .notif-btn.denied { background: rgba(255,82,82,.08); border-color: rgba(255,82,82,.2); color: #ff5252; }
+
+    /* ── Terrains ── */
+    .terrains-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; }
+    .terrains-label { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.6); }
+    .terrains-label span { display: block; font-family:'Space Mono',monospace; font-size: 11px; color: rgba(255,255,255,.25); margin-top: 3px; font-weight: 400; }
+    .terrains-btns { display: flex; gap: 8px; }
+    .terrain-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 14px; border-radius: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); color: rgba(255,255,255,.4); font-family:'Outfit',sans-serif; transition: all .2s; }
+    .terrain-btn:hover { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+    .terrain-btn.active { background: rgba(227,6,19,.15); border-color: rgba(227,6,19,.5); color: #e30613; }
+    .terrain-btn .tb-num { font-family:'Space Mono',monospace; font-size: 20px; font-weight: 700; line-height: 1; }
+    .terrain-btn .tb-label { font-size: 10px; font-weight: 600; letter-spacing: .5px; }
+    .terrain-btn .tb-places { font-size: 9px; opacity: .6; }
+
+    /* ── Week tabs ── */
+    .planning-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,.3); text-transform: uppercase; margin-bottom: 12px; }
+    .weeks-scroll { display: flex; gap: 10px; margin-bottom: 32px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .weeks-scroll::-webkit-scrollbar { display: none; }
+    .week-tab { flex: 0 0 auto; min-width: 130px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 14px 16px; cursor: pointer; transition: all .2s; position: relative; text-align: left; }
+    .week-tab:hover { border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.07); }
+    .week-tab.active { background: rgba(227,6,19,.12); border-color: rgba(227,6,19,.5); }
+    .week-tab.locked { opacity: .45; cursor: not-allowed; }
+    .week-tab .wt-num { font-family:'Space Mono',monospace; font-size: 22px; font-weight: 700; line-height: 1; color: #fff; }
+    .week-tab.active .wt-num { color: #e30613; }
+    .week-tab .wt-month { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 3px; }
+    .week-tab .wt-badge { margin-top: 10px; font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 3px 8px; border-radius: 6px; display: inline-block; }
+    .week-tab .wt-badge.open    { background: rgba(227,6,19,.15); color: #e30613; }
+    .week-tab .wt-badge.full    { background: rgba(255,82,82,.15);  color: #ff5252; }
+    .week-tab .wt-badge.waiting { background: rgba(255,171,64,.15); color: #ffab40; }
+    .week-tab .wt-badge.next    { background: rgba(255,255,255,.07);color: rgba(255,255,255,.3); }
+    .week-tab .wt-count { position: absolute; top: 12px; right: 12px; font-family:'Space Mono',monospace; font-size: 10px; color: rgba(255,255,255,.25); }
+    .week-tab.active .wt-count { color: rgba(227,6,19,.7); }
+
+    /* ── Cards ── */
+    .card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 28px 32px; margin-bottom: 20px; }
+    .card-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,.6); margin-bottom: 20px; }
+
+    /* Counter */
+    .counter-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .counter-number { font-family:'Space Mono',monospace; font-size: 48px; font-weight: 700; line-height: 1; transition: color .3s; color: #e30613; }
+    .counter-number .total { font-size: 20px; color: rgba(255,255,255,.3); }
+    .counter-label { font-size: 13px; color: rgba(255,255,255,.4); margin-top: 6px; }
+    .progress-wrap { flex: 1; }
+    .progress-bar { height: 8px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width .5s ease, background .3s ease; background: linear-gradient(90deg,#e30613,#0032a0); }
+    .progress-ticks { display: flex; justify-content: space-between; margin-top: 8px; font-family:'Space Mono',monospace; font-size: 10px; color: rgba(255,255,255,.2); }
+
+    /* Lock */
+    .lock-notice { background: rgba(255,171,64,.08); border: 1px solid rgba(255,171,64,.25); border-radius: 14px; padding: 18px 22px; text-align: center; color: #ffab40; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+    .lock-notice strong { display: block; font-size: 17px; margin-bottom: 6px; }
+
+    /* Form */
+    .form-fields { display: flex; flex-direction: column; gap: 10px; }
+    .form-row { display: flex; gap: 12px; }
+    input[type="text"], input[type="email"] { flex: 1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 13px 18px; color: #fff; font-size: 15px; font-family:'Outfit',sans-serif; outline: none; transition: border-color .2s; -webkit-appearance: none; }
+    input:focus { border-color: rgba(227,6,19,.6); }
+    input::placeholder { color: rgba(255,255,255,.2); }
+    input[type="email"] { font-size: 13px; }
+    .email-hint { font-size: 11px; color: rgba(255,255,255,.2); margin-top: 2px; padding-left: 4px; }
+    .btn-primary { background: linear-gradient(135deg,#e30613,#b30010); border: none; border-radius: 12px; padding: 13px 22px; color: #fff; font-family:'Outfit',sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: opacity .2s, transform .1s; -webkit-tap-highlight-color: transparent; }
+    .btn-primary:active { transform: scale(.97); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    .msg-error    { color: #ff5252; font-size: 13px; margin-top: 10px; font-weight: 500; }
+    .msg-success  { color: #e30613; font-size: 13px; margin-top: 10px; font-weight: 500; }
+    .msg-waitlist { color: #ffab40; font-size: 13px; margin-top: 10px; font-weight: 500; }
+
+    /* Player list */
+    .player-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,.04); border-radius: 12px; border: 1px solid rgba(255,255,255,.06); margin-bottom: 8px; animation: fadeIn .3s ease; }
+    .player-item.waitlist-item { background: rgba(255,171,64,.04); border-color: rgba(255,171,64,.12); }
+    .player-left { display: flex; align-items: center; gap: 14px; }
+    .player-num  { font-family:'Space Mono',monospace; font-size: 11px; color: rgba(255,255,255,.2); width: 20px; }
+    .player-name { font-size: 15px; font-weight: 500; }
+    .player-email-icon { font-size: 11px; color: rgba(255,255,255,.2); margin-left: 5px; }
+    .waitlist-badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 5px; background: rgba(255,171,64,.15); color: #ffab40; white-space: nowrap; }
+    .btn-remove { background: rgba(255,82,82,.1); border: 1px solid rgba(255,82,82,.2); border-radius: 8px; padding: 6px 12px; color: #ff5252; font-size: 12px; cursor: pointer; font-family:'Outfit',sans-serif; transition: background .2s; -webkit-tap-highlight-color: transparent; }
+    .btn-remove:hover { background: rgba(255,82,82,.2); }
+    .empty { color: rgba(255,255,255,.2); font-size: 14px; font-style: italic; }
+    .waitlist-separator { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; }
+    .waitlist-separator-line { flex: 1; height: 1px; background: rgba(255,171,64,.2); }
+    .waitlist-separator-text { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #ffab40; text-transform: uppercase; }
+
+    /* Chat */
+    .chat-messages { max-height: 280px; overflow-y: auto; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.1) transparent; -webkit-overflow-scrolling: touch; }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+    .chat-msg { display: flex; flex-direction: column; gap: 2px; animation: fadeIn .25s ease; }
+    .chat-msg-header { display: flex; align-items: baseline; gap: 8px; }
+    .chat-msg-name { font-size: 12px; font-weight: 700; color: #e30613; }
+    .chat-msg-time { font-family:'Space Mono',monospace; font-size: 9px; color: rgba(255,255,255,.2); }
+    .chat-msg-text { font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.4; padding-left: 2px; }
+    .chat-empty { color: rgba(255,255,255,.2); font-size: 13px; font-style: italic; text-align: center; padding: 20px 0; }
+    .chat-form { display: flex; gap: 8px; align-items: center; }
+    .chat-name-input { width: 120px !important; flex: none !important; font-size: 13px !important; padding: 10px 12px !important; }
+    .btn-chat { background: linear-gradient(135deg,#e30613,#b30010); border: none; border-radius: 11px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: transform .1s; flex-shrink: 0; -webkit-tap-highlight-color: transparent; color: #fff; }
+    .btn-chat:active { transform: scale(.9); }
+    .btn-chat:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* Install banner */
+    .install-banner { display: none; align-items: center; justify-content: space-between; background: rgba(227,6,19,.08); border: 1px solid rgba(227,6,19,.25); border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; gap: 12px; }
+    .install-banner.visible { display: flex; }
+    .install-banner-text { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.4; }
+    .install-banner-text strong { color: #e30613; display: block; margin-bottom: 2px; }
+    .btn-install { background: linear-gradient(135deg,#e30613,#b30010); border: none; border-radius: 10px; padding: 8px 16px; color: #fff; font-family:'Outfit',sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .btn-install-close { background: none; border: none; color: rgba(255,255,255,.3); font-size: 18px; cursor: pointer; padding: 0 4px; }
+
+    .spinner { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,.1); border-top-color: #e30613; border-radius: 50%; animation: spin .8s linear infinite; margin: 12px auto; display: block; }
+
+    @keyframes fadeIn    { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin      { to { transform: rotate(360deg); } }
+    @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
+  </style>
+</head>
+<body>
+  <div id="bg-grid"></div>
+  <div id="glow-red"></div>
+  <div id="glow-navy"></div>
+
+  <div class="container">
+
+    <!-- Install banner -->
+    <div class="install-banner" id="install-banner">
+      <div class="install-banner-text">
+        <strong>📱 Installer l'app</strong>
+        Ajouter Inscriptor Patrick sur ton écran d'accueil
+      </div>
+      <button class="btn-install" onclick="installPWA()">Installer</button>
+      <button class="btn-install-close" onclick="dismissInstall()">✕</button>
+    </div>
+
+    <div class="badge">🏸 Badminton · Patrick · Jeudi soir</div>
+    <h1>INSCRIPTOR<br><span>PATRICK</span></h1>
+    <p class="subtitle">Jeudi soir · 19h00 – 20h30</p>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <div class="live-badge" id="live-badge">
+        <span class="live-dot"></span><span id="live-text">LIVE · Mise à jour auto</span>
+      </div>
+      <button class="notif-btn" id="notif-btn" onclick="toggleNotifications()">
+        <span id="notif-icon">🔔</span>
+        <span id="notif-label">Notifications</span>
+      </button>
+    </div>
+
+    <!-- Terrains -->
+    <div class="terrains-row">
+      <div class="terrains-label">
+        Terrains
+        <span id="terrains-subtitle">3 terrains · 12 places</span>
+      </div>
+      <div class="terrains-btns">
+        <button class="terrain-btn" id="tb-2" onclick="setTerrains(2)">
+          <span class="tb-num">2</span>
+          <span class="tb-label">terrains</span>
+          <span class="tb-places">8 places</span>
+        </button>
+        <button class="terrain-btn active" id="tb-3" onclick="setTerrains(3)">
+          <span class="tb-num">3</span>
+          <span class="tb-label">terrains</span>
+          <span class="tb-places">12 places</span>
+        </button>
+        <button class="terrain-btn" id="tb-4" onclick="setTerrains(4)">
+          <span class="tb-num">4</span>
+          <span class="tb-label">terrains</span>
+          <span class="tb-places">16 places</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="planning-label">Choisir une soirée</p>
+    <div class="weeks-scroll" id="weeks-scroll"></div>
+
+    <div class="card">
+      <div class="counter-row">
+        <div>
+          <div class="counter-number" id="counter-display">
+            <span id="count">0</span><span class="total" id="count-total">/12</span>
+          </div>
+          <div class="counter-label" id="spots-label">Chargement...</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+          <div class="progress-ticks"><span>0</span><span id="tick-mid">6</span><span id="tick-max">12</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lock-notice" id="lock-notice" style="display:none">
+      <strong>🔒 Inscriptions pas encore ouvertes</strong>
+      Les inscriptions ouvrent <span id="lock-open-date"></span>.
+    </div>
+
+    <div class="card" id="form-card">
+      <div class="card-title" id="form-title">S'inscrire</div>
+      <div class="form-fields">
+        <div class="form-row">
+          <input type="text"  id="name-input"  placeholder="Prénom Nom" autocomplete="name" />
+          <button class="btn-primary" id="register-btn" onclick="register()">Je m'inscris</button>
+        </div>
+        <div>
+          <input type="email" id="email-input" placeholder="Email (optionnel — rappels & liste d'attente)" autocomplete="email" />
+          <p class="email-hint">📧 Ton email ne sera jamais affiché publiquement</p>
+        </div>
+      </div>
+      <p id="form-msg"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="list-title">Inscrits (0)</div>
+      <div id="player-list"><div class="spinner"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💬 Chat du groupe</div>
+      <div class="chat-messages" id="chat-messages"><div class="spinner"></div></div>
+      <div class="chat-form">
+        <input type="text" id="chat-name" class="chat-name-input" placeholder="Pseudo" maxlength="20" autocomplete="nickname" />
+        <input type="text" id="chat-msg"  placeholder="Ton message..." maxlength="200" />
+        <button class="btn-chat" id="chat-send-btn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysIMiXMxbf7j4HmLaiGSohilMcg7ouSFSDIISxrzksTYwdr2ZSHiWV4MJXBhUooOXG/exec";
+    const WAITLIST_MAX = 2;
+    const DAYS_OPEN    = 28;
+    const TERRAINS_MAX = { 2: 8, 3: 12, 4: 16 };
+    const PREFIX       = "patrick"; // préfixe unique pour les clés du sheet
+
+    let selectedIdx    = 0;
+    let thursdays      = [];
+    let weekData       = {};
+    let nbTerrains     = parseInt(localStorage.getItem("inscriptor-patrick-terrains") || "3");
+    let deferredPrompt = null;
+    let swReg          = null;
+
+    // ── PWA ───────────────────────────────────────────────────────────
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault(); deferredPrompt = e;
+      if (!localStorage.getItem("inscriptor-patrick-install-dismissed"))
+        document.getElementById("install-banner").classList.add("visible");
+    });
+    function installPWA() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        document.getElementById("install-banner").classList.remove("visible");
+      });
+    }
+    function dismissInstall() {
+      localStorage.setItem("inscriptor-patrick-install-dismissed", "1");
+      document.getElementById("install-banner").classList.remove("visible");
+    }
+
+    async function initSW() {
+      if (!("serviceWorker" in navigator)) return;
+      try { swReg = await navigator.serviceWorker.register("sw.js"); } catch(e) {}
+    }
+    async function requestNotifPermission() {
+      if (!("Notification" in window)) return false;
+      if (Notification.permission === "granted") return true;
+      if (Notification.permission === "denied") return false;
+      return (await Notification.requestPermission()) === "granted";
+    }
+    function sendSnapshotToSW(snapshot) {
+      if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+      navigator.serviceWorker.controller.postMessage({ type: "SAVE_SNAPSHOT", snapshot });
+      navigator.serviceWorker.controller.postMessage({ type: "START_CHECK" });
+    }
+    function updateNotifButton() {
+      const btn = document.getElementById("notif-btn");
+      if (!("Notification" in window)) { btn.style.display = "none"; return; }
+      if (Notification.permission === "granted") {
+        btn.className = "notif-btn active";
+        document.getElementById("notif-icon").textContent = "🔔";
+        document.getElementById("notif-label").textContent = "Notifs actives";
+      } else if (Notification.permission === "denied") {
+        btn.className = "notif-btn denied";
+        document.getElementById("notif-icon").textContent = "🔕";
+        document.getElementById("notif-label").textContent = "Notifs bloquées";
+      } else {
+        btn.className = "notif-btn";
+        document.getElementById("notif-icon").textContent = "🔔";
+        document.getElementById("notif-label").textContent = "Notifications";
+      }
+    }
+    async function toggleNotifications() {
+      if (!("Notification" in window)) { alert("Sur iPhone : installe d'abord l'app (Safari → partage → Sur l'écran d'accueil)"); return; }
+      if (Notification.permission === "denied") { alert("Notifications bloquées. Vérifie les réglages de ton navigateur."); return; }
+      if (Notification.permission === "granted") {
+        if (swReg) swReg.showNotification("🏸 Inscriptor Patrick", { body: "Les notifications sont actives !", tag: "test" });
+        return;
+      }
+      const granted = await requestNotifPermission();
+      if (granted) {
+        sendSnapshotToSW(buildSnapshot());
+        if (swReg) swReg.showNotification("🏸 Inscriptor Patrick", { body: "Tu recevras une notification à chaque inscription ou désistement.", tag: "welcome" });
+      }
+      updateNotifButton();
+    }
+    function buildSnapshot() {
+      const snap = {};
+      thursdays.forEach(d => {
+        const key = dateKey(d);
+        if (weekData[key]) snap[key] = { players: (weekData[key].players||[]).map(p=>p.name), waitlist: (weekData[key].waitlist||[]).map(p=>p.name) };
+      });
+      return snap;
+    }
+
+    // ── Terrains ──────────────────────────────────────────────────────
+    function setTerrains(n) {
+      nbTerrains = n;
+      localStorage.setItem("inscriptor-patrick-terrains", String(n));
+      [2,3,4].forEach(t => document.getElementById("tb-"+t).classList.toggle("active", t === n));
+      const max = TERRAINS_MAX[n];
+      document.getElementById("terrains-subtitle").textContent = n + " terrain" + (n>1?"s":"") + " · " + max + " places";
+      document.getElementById("count-total").textContent = "/" + max;
+      document.getElementById("tick-mid").textContent = Math.floor(max/2);
+      document.getElementById("tick-max").textContent = max;
+      renderTabs();
+      const key = dateKey(thursdays[selectedIdx]);
+      if (weekData[key]) renderPlayers(weekData[key]);
+    }
+    function getMax() { return TERRAINS_MAX[nbTerrains]; }
+
+    // ── Dates ─────────────────────────────────────────────────────────
+    function getNextThursdays(n) {
+      const now   = new Date();
+      const local = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const day   = local.getDay();
+      const diff  = day <= 4 ? 4 - day : 11 - day;
+      return Array.from({length: n}, (_, i) => {
+        const d = new Date(local); d.setDate(local.getDate() + diff + i*7); return d;
+      });
+    }
+    function dateKey(d) { return PREFIX + "-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); }
+    function isOpen(d)  { return Math.floor((d - new Date()) / 86400000) <= DAYS_OPEN; }
+    function openDateLabel(d) {
+      const od = new Date(d); od.setDate(od.getDate() - DAYS_OPEN);
+      return od.toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
+    }
+    function chatWeekKey() {
+      const now = new Date(); const day = now.getDay();
+      const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      mon.setDate(mon.getDate() - (day === 0 ? 6 : day - 1));
+      return "chat-" + PREFIX + "-" + mon.getFullYear() + "-" + (mon.getMonth()+1) + "-" + mon.getDate();
+    }
+
+    // ── API ───────────────────────────────────────────────────────────
+    async function api(action, params = {}) {
+      const url = new URL(APPS_SCRIPT_URL);
+      url.searchParams.set("action", action);
+      Object.keys(params).forEach(k => { if (params[k] !== undefined && params[k] !== "") url.searchParams.set(k, params[k]); });
+      url.searchParams.set("_cb", Date.now());
+      const res = await fetch(url.toString(), { cache: "no-store" });
+      return res.json();
+    }
+
+    // ── Tabs ──────────────────────────────────────────────────────────
+    function renderTabs() {
+      const max = getMax();
+      document.getElementById("weeks-scroll").innerHTML = thursdays.map((d, i) => {
+        const open   = isOpen(d);
+        const key    = dateKey(d);
+        const wd     = weekData[key] || { players:[], waitlist:[] };
+        const cnt    = wd.players.length;
+        const full   = cnt >= max;
+        const wFull  = full && wd.waitlist.length >= WAITLIST_MAX;
+        const active = i === selectedIdx;
+        const dayNum = d.toLocaleDateString("fr-FR", { day:"numeric" });
+        const month  = d.toLocaleDateString("fr-FR", { month:"short" });
+        let badge = "";
+        if (!open)      badge = '<span class="wt-badge next">🔒 J-' + Math.ceil((d-new Date())/86400000) + '</span>';
+        else if (wFull) badge = '<span class="wt-badge full">Complet</span>';
+        else if (full)  badge = '<span class="wt-badge waiting">⏳ Liste att.</span>';
+        else            badge = '<span class="wt-badge open">' + (i===0 ? "Ce jeudi" : "Ouvert") + '</span>';
+        const countHtml = weekData[key] !== undefined ? '<span class="wt-count">' + cnt + '/' + max + '</span>' : "";
+        return '<div class="week-tab ' + (active?"active":"") + ' ' + (!open?"locked":"") + '" onclick="' + (open?"selectWeek("+i+")":"") + '">' +
+          countHtml + '<div class="wt-num">' + dayNum + '</div><div class="wt-month">' + month + '</div>' + badge + '</div>';
+      }).join("");
+    }
+    function selectWeek(idx) { selectedIdx = idx; renderTabs(); loadPlayers(); }
+
+    // ── Load ──────────────────────────────────────────────────────────
+    function safePlayer(p) {
+      if (!p) return { name:"", email:"" };
+      if (typeof p === "string") { const m = p.match(/^(.*?)<([^>]+)>$/); return m ? {name:m[1].trim(),email:m[2].trim()} : {name:p.trim(),email:""}; }
+      return { name: p.name||"", email: p.email||"" };
+    }
+
+    async function loadPlayers() {
+      const key = dateKey(thursdays[selectedIdx]);
+      document.getElementById("player-list").innerHTML = '<div class="spinner"></div>';
+      try {
+        const data = await api("list", { week: key });
+        weekData[key] = { players:(data.players||[]).map(safePlayer), waitlist:(data.waitlist||[]).map(safePlayer) };
+        renderTabs(); renderPlayers(weekData[key]);
+      } catch(e) {
+        document.getElementById("player-list").innerHTML = '<p style="color:#ff5252;font-size:13px">Erreur de connexion.</p>';
+      }
+    }
+
+    async function prefetchAll() {
+      await Promise.all(thursdays.map(async d => {
+        const key = dateKey(d);
+        try {
+          const data = await api("list", { week: key });
+          weekData[key] = { players:(data.players||[]).map(safePlayer), waitlist:(data.waitlist||[]).map(safePlayer) };
+        } catch(e) { weekData[key] = { players:[], waitlist:[] }; }
+      }));
+      renderTabs();
+    }
+
+    // ── Render players ────────────────────────────────────────────────
+    function renderPlayers(wd) {
+      const max      = getMax();
+      const d        = thursdays[selectedIdx];
+      const open     = isOpen(d);
+      const players  = wd.players || [];
+      const waitlist = wd.waitlist || [];
+      const count    = players.length;
+      const isFull   = count >= max;
+      const pct      = Math.min((count/max)*100, 100);
+
+      document.getElementById("count").textContent = count;
+      document.getElementById("count-total").textContent = "/" + max;
+      document.getElementById("tick-mid").textContent = Math.floor(max/2);
+      document.getElementById("tick-max").textContent = max;
+      document.getElementById("list-title").textContent = "Inscrits (" + count + ")";
+
+      const fill = document.getElementById("progress-fill");
+      fill.style.width = pct + "%";
+      fill.style.background = isFull
+        ? "linear-gradient(90deg,#ff5252,#ff1744)"
+        : count >= Math.floor(max*.75)
+          ? "linear-gradient(90deg,#ffab40,#ff6d00)"
+          : "linear-gradient(90deg,#e30613,#0032a0)";
+
+      document.getElementById("counter-display").style.color = isFull ? "#ff5252" : "#e30613";
+
+      const wCount = waitlist.length; const wFull = wCount >= WAITLIST_MAX;
+      document.getElementById("spots-label").textContent = !isFull
+        ? (max-count) + " place" + (max-count>1?"s":"") + " disponible" + (max-count>1?"s":"")
+        : !wFull ? "Complet — liste d'attente (" + wCount + "/" + WAITLIST_MAX + ")"
+        : "Complet · Liste d'attente complète";
+
+      const lockNotice = document.getElementById("lock-notice");
+      const formCard   = document.getElementById("form-card");
+      if (!open) {
+        lockNotice.style.display = "block";
+        document.getElementById("lock-open-date").textContent = openDateLabel(d);
+        formCard.style.display = "none";
+      } else {
+        lockNotice.style.display = "none";
+        formCard.style.display = (isFull && wFull) ? "none" : "block";
+        document.getElementById("register-btn").textContent = isFull ? "Rejoindre la liste d'attente" : "Je m'inscris";
+      }
+
+      const dayLabel = d.toLocaleDateString("fr-FR", { day:"numeric", month:"long" });
+      document.getElementById("form-title").textContent = "S'inscrire — jeudi " + dayLabel + " · 19h–20h30";
+
+      const listEl = document.getElementById("player-list");
+      if (players.length === 0 && waitlist.length === 0) {
+        listEl.innerHTML = '<p class="empty">Aucun inscrit pour l\'instant. Sois le premier ! 🏸</p>'; return;
+      }
+      let html = players.map((p, i) =>
+        '<div class="player-item"><div class="player-left">' +
+        '<span class="player-num">' + String(i+1).padStart(2,"0") + '</span>' +
+        '<span class="player-name">' + escHtml(p.name) + (p.email?'<span class="player-email-icon">📧</span>':"") + '</span>' +
+        '</div><button class="btn-remove" onclick="removePlayer(\'' + escAttr(p.name) + '\')">Retirer</button></div>'
+      ).join("");
+      if (waitlist.length > 0) {
+        html += '<div class="waitlist-separator"><div class="waitlist-separator-line"></div><div class="waitlist-separator-text">⏳ Liste d\'attente</div><div class="waitlist-separator-line"></div></div>';
+        html += waitlist.map((p, i) =>
+          '<div class="player-item waitlist-item"><div class="player-left">' +
+          '<span class="player-num">#' + (i+1) + '</span>' +
+          '<span class="player-name">' + escHtml(p.name) + (p.email?'<span class="player-email-icon">📧</span>':"") + '</span>' +
+          '</div><div style="display:flex;align-items:center;gap:8px">' +
+          '<span class="waitlist-badge">Attente ' + (i+1) + '/' + WAITLIST_MAX + '</span>' +
+          '<button class="btn-remove" onclick="removePlayer(\'' + escAttr(p.name) + '\')">Retirer</button></div></div>'
+        ).join("");
+      }
+      listEl.innerHTML = html;
+    }
+
+    // ── Actions ───────────────────────────────────────────────────────
+    async function register() {
+      const max   = getMax();
+      const name  = document.getElementById("name-input").value.trim();
+      const email = document.getElementById("email-input").value.trim();
+      clearMsg();
+      if (!name) { showMsg("Veuillez entrer votre prénom et nom.", "error"); return; }
+      const key = dateKey(thursdays[selectedIdx]);
+      const wd  = weekData[key] || { players:[], waitlist:[] };
+      const all = [...wd.players, ...wd.waitlist].map(p => p.name.toLowerCase());
+      if (all.includes(name.toLowerCase())) { showMsg("Ce nom est déjà inscrit !", "error"); return; }
+      const btn = document.getElementById("register-btn");
+      btn.disabled = true; btn.textContent = "En cours...";
+      try {
+        const data = await api("add", { week: key, name, email });
+        if (data.success) {
+          weekData[key] = { players:(data.players||[]).map(safePlayer), waitlist:(data.waitlist||[]).map(safePlayer) };
+          renderPlayers(weekData[key]); renderTabs();
+          document.getElementById("name-input").value = "";
+          document.getElementById("email-input").value = "";
+          if (data.status === "waitlist") showMsg("⏳ " + name + " est en liste d'attente (position " + data.position + "/" + data.waitlistMax + ") !", "waitlist");
+          else showMsg("✓ " + name + " est inscrit·e !", "success");
+          setTimeout(clearMsg, 4000);
+        } else { showMsg(data.error || "Erreur.", "error"); }
+      } catch(e) { showMsg("Erreur de connexion.", "error"); }
+      const wd2 = weekData[dateKey(thursdays[selectedIdx])] || { players:[] };
+      btn.disabled = false;
+      btn.textContent = wd2.players.length >= max ? "Rejoindre la liste d'attente" : "Je m'inscris";
+    }
+
+    async function removePlayer(name) {
+      const key = dateKey(thursdays[selectedIdx]);
+      try {
+        const data = await api("remove", { week: key, name });
+        if (data.success) {
+          weekData[key] = { players:(data.players||[]).map(safePlayer), waitlist:(data.waitlist||[]).map(safePlayer) };
+          renderPlayers(weekData[key]); renderTabs();
+          if (data.promoted) { showMsg("✓ " + data.promoted + " a été promu·e de la liste d'attente !", "success"); setTimeout(clearMsg, 4000); }
+        }
+      } catch(e) { alert("Erreur de connexion."); }
+    }
+
+    // ── Chat ──────────────────────────────────────────────────────────
+    async function loadChat() {
+      try {
+        const data = await api("chatList", { week: chatWeekKey() });
+        renderChat(data.messages || []);
+      } catch(e) { document.getElementById("chat-messages").innerHTML = '<p class="chat-empty">Erreur de connexion.</p>'; }
+    }
+    function renderChat(messages) {
+      const el = document.getElementById("chat-messages");
+      if (!messages || messages.length === 0) { el.innerHTML = '<p class="chat-empty">Pas encore de messages cette semaine. Dis bonjour ! 👋</p>'; return; }
+      const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+      el.innerHTML = messages.map(m =>
+        '<div class="chat-msg"><div class="chat-msg-header"><span class="chat-msg-name">' + escHtml(m.name) + '</span><span class="chat-msg-time">' + m.time + '</span></div>' +
+        '<div class="chat-msg-text">' + escHtml(m.text) + '</div></div>'
+      ).join("");
+      if (wasAtBottom) el.scrollTop = el.scrollHeight;
+    }
+    async function sendChat() {
+      const name = document.getElementById("chat-name").value.trim();
+      const text = document.getElementById("chat-msg").value.trim();
+      if (!name || !text) return;
+      const btn = document.getElementById("chat-send-btn"); btn.disabled = true;
+      try {
+        const data = await api("chatAdd", { week: chatWeekKey(), name, message: text });
+        if (data.success) {
+          document.getElementById("chat-msg").value = "";
+          renderChat(data.messages || []);
+          document.getElementById("chat-messages").scrollTop = document.getElementById("chat-messages").scrollHeight;
+          localStorage.setItem("inscriptor-patrick-chat-name", name);
+        }
+      } catch(e) {}
+      btn.disabled = false;
+    }
+
+    // ── Utils ─────────────────────────────────────────────────────────
+    function showMsg(text, type) {
+      const el = document.getElementById("form-msg"); el.textContent = text;
+      el.className = type==="error" ? "msg-error" : type==="waitlist" ? "msg-waitlist" : "msg-success";
+    }
+    function clearMsg() { const el = document.getElementById("form-msg"); el.textContent=""; el.className=""; }
+    function escHtml(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    function escAttr(s) { return String(s||"").replace(/'/g,"\\'"); }
+
+    document.getElementById("name-input").addEventListener("keydown", e => { if(e.key==="Enter") register(); });
+    document.getElementById("chat-msg").addEventListener("keydown",   e => { if(e.key==="Enter") sendChat(); });
+
+    const savedName = localStorage.getItem("inscriptor-patrick-chat-name");
+    if (savedName) document.getElementById("chat-name").value = savedName;
+
+    // ── Init ──────────────────────────────────────────────────────────
+    initSW();
+    thursdays = getNextThursdays(4);
+    setTerrains(nbTerrains);
+    renderTabs(); loadPlayers();
+    prefetchAll().then(() => setTimeout(() => sendSnapshotToSW(buildSnapshot()), 2000));
+    loadChat();
+    updateNotifButton();
+
+    // ── Auto-refresh 15s ──────────────────────────────────────────────
+    setInterval(async () => {
+      const badge = document.getElementById("live-badge");
+      badge.classList.add("syncing");
+      document.getElementById("live-text").textContent = "SYNC · En cours...";
+      await Promise.all(thursdays.map(async d => {
+        const key = dateKey(d);
+        try {
+          const data = await api("list", { week: key });
+          weekData[key] = { players:(data.players||[]).map(safePlayer), waitlist:(data.waitlist||[]).map(safePlayer) };
+        } catch(e) {}
+      }));
+      try {
+        const data = await api("chatList", { week: chatWeekKey() });
+        if (data.messages) renderChat(data.messages);
+      } catch(e) {}
+      renderTabs();
+      renderPlayers(weekData[dateKey(thursdays[selectedIdx])] || { players:[], waitlist:[] });
+      badge.classList.remove("syncing");
+      document.getElementById("live-text").textContent = "LIVE · Mise à jour auto";
+      sendSnapshotToSW(buildSnapshot());
+    }, 15000);
+  </script>
+</body>
+</html>
